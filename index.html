@@ -62,6 +62,7 @@
       src="video2.mp4"
       autoplay
       loop
+      muted
       playsinline
       webkit-playsinline
       preload="auto">
@@ -86,12 +87,18 @@
   const video = document.querySelector('#vid');
 
 
+
   // Unlock sound on first interaction (required by mobile)
   const unlock = () => {
     video.muted = false;
     video.volume = 1.0;
     video.play();
-    
+    window.removeEventListener('click', unlock);
+    window.removeEventListener('touchstart', unlock);
+  };
+
+  window.addEventListener('click', unlock);
+  window.addEventListener('touchstart', unlock);
 </script>
 
 </body>
