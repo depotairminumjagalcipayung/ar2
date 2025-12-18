@@ -8,51 +8,6 @@
 
   <!-- AR.js -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-  <!-- Volume-by-visibility component -->
-  <script>
-    AFRAME.registerComponent('volume-by-visibility', {
-      schema: {
-        maxVolume: { default: 1.0 },
-        minVolume: { default: 0.0 },
-        fadeSpeed: { default: 0.03 }
-      },
-
-      init() {
-        const src = this.el.getAttribute('src');
-        this.video = document.querySelector(src);
-        this.targetVolume = this.schema.maxVolume;
-      },
-
-      tick() {
-        if (!this.video) return;
-
-        const cam = this.el.sceneEl.camera;
-        if (!cam) return;
-
-        cam.updateMatrixWorld();
-
-        const frustum = new THREE.Frustum();
-        const matrix = new THREE.Matrix4()
-          .multiplyMatrices(
-            cam.projectionMatrix,
-            cam.matrixWorldInverse
-          );
-
-        frustum.setFromProjectionMatrix(matrix);
-
-        const visible = frustum.intersectsObject(this.el.object3D);
-
-        this.targetVolume = visible
-          ? this.schema.maxVolume
-          : this.schema.minVolume;
-
-        // Smooth volume interpolation
-        this.video.volume +=
-          (this.targetVolume - this.video.volume) * this.schema.fadeSpeed;
-      }
-    });
-  </script>
 </head>
 
 <body style="margin:0; overflow:hidden;">
@@ -66,25 +21,25 @@
   <!-- Assets -->
   <a-assets>
     <video id="vid"
-      src="video2.mp4"
+      src="video.mp4"
       autoplay
-      muted
       loop
+      muted
       playsinline
-      webkit-playsinline>
+      webkit-playsinline
+      preload="auto">
     </video>
   </a-assets>
 
-  <!-- Camera (IMPORTANT: video is NOT inside camera) -->
+  <!-- Camera -->
   <a-camera gps-camera rotation-reader></a-camera>
 
-  <!-- World-space video -->
+  <!-- World video -->
   <a-video
     src="#vid"
     position="0 1.5 -3"
     width="2"
-    height="1.125"
-    volume-by-visibility="maxVolume: 1; minVolume: 0; fadeSpeed: 0.03">
+    height="1.125">
   </a-video>
 
 </a-scene>
@@ -92,13 +47,15 @@
 <script>
   const video = document.querySelector('#vid');
 
-  // Try autoplay immediately
-  video.play().catch(() => {});
-
-  // Mobile unlock fallback (no visible button)
+  // HARD mobile autoplay unlock
   document.body.addEventListener('click', () => {
-    if (video.paused) video.play();
+    if (video.paused) {
+      video.play();
+    }
   }, { once: true });
+
+  // Attempt autoplay immediately
+  video.play().catch(() => {});
 </script>
 
 </body>
