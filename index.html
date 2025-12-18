@@ -3,20 +3,23 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <!-- AR.js -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
-  <!-- Audio by visibility -->
+  <!-- Visibility → audio volume -->
   <script>
-    AFRAME.registerComponent('audio-by-visibility', {
+    AFRAME.registerComponent('audio-volume-by-visibility', {
       schema: {
-        maxVolume: { default: 1 },
-        minVolume: { default: 0 },
+        maxVolume: { default: 1.0 },
+        minVolume: { default: 0.0 },
         fadeSpeed: { default: 0.02 }
       },
 
       init() {
-        this.audio = document.querySelector('#audio');
+        this.audio = document.getElementById('audio');
       },
 
       tick() {
@@ -38,6 +41,7 @@
         const visible = frustum.intersectsObject(this.el.object3D);
         const target = visible ? this.schema.maxVolume : this.schema.minVolume;
 
+        // Smooth fade
         this.audio.volume +=
           (target - this.audio.volume) * this.schema.fadeSpeed;
       }
@@ -47,14 +51,17 @@
 
 <body style="margin:0; overflow:hidden;">
 
+<!-- 🔊 AUDIO (OUTSIDE A-SCENE) -->
+<audio id="audio" src="audio.aac" preload="auto"></audio>
+
 <a-scene
   embedded
   vr-mode-ui="enabled:false"
   arjs="sourceType:webcam; debugUIEnabled:false;"
-  renderer="precision: high; logarithmicDepthBuffer: true">
+  renderer="precision: high; logarithmicDepthBuffer: true;">
 
   <a-assets>
-    <!-- VIDEO: NO AUDIO TRACK -->
+    <!-- 🎥 VIDEO (NO AUDIO TRACK) -->
     <video id="vid"
       src="video2.mp4"
       autoplay
@@ -64,44 +71,43 @@
       webkit-playsinline
       preload="auto">
     </video>
-
-    <!-- AUDIO: SEPARATE FILE -->
-    <audio id="audio"
-      src="audio.m4a"
-      preload="auto">
-    </audio>
   </a-assets>
 
+  <!-- Camera (NO GPS) -->
   <a-camera position="0 1.6 0"></a-camera>
 
+  <!-- World-space video -->
   <a-video
+    id="screen"
     src="#vid"
     position="0 1.5 -3"
     width="2"
     height="1.125"
     material="shader: flat"
-    audio-by-visibility>
+    audio-volume-by-visibility="maxVolume:1; minVolume:0; fadeSpeed:0.02">
   </a-video>
 
 </a-scene>
 
 <script>
-  const video = document.querySelector('#vid');
-  const audio = document.querySelector('#audio');
+  const video = document.getElementById('vid');
+  const audio = document.getElementById('audio');
 
-  // Start video safely
+  // Start video immediately (muted, safe)
   video.play().catch(() => {});
 
-  // Unlock audio on first interaction
-  const unlock = () => {
-    audio.currentTime = video.currentTime;
+  // REQUIRED: unlock audio on first user interaction
+  const unlockAudio = () => {
+    audio.currentTime = video.currentTime; // sync once
+    audio.volume = 1.0;
     audio.play();
-    window.removeEventListener('click', unlock);
-    window.removeEventListener('touchstart', unlock);
+
+    window.removeEventListener('touchstart', unlockAudio);
+    window.removeEventListener('click', unlockAudio);
   };
 
-  window.addEventListener('click', unlock);
-  window.addEventListener('touchstart', unlock);
+  window.addEventListener('touchstart', unlockAudio, { once: true });
+  window.addEventListener('click', unlockAudio, { once: true });
 </script>
 
 </body>
