@@ -93,7 +93,6 @@
   const unlock = () => {
     video.muted = false;
     video.volume = 1.0;
-    video.play();
     window.removeEventListener('click', unlock);
     window.removeEventListener('touchstart', unlock);
   };
