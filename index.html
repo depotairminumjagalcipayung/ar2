@@ -2,50 +2,8 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-
-  <!-- AR.js -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-  <!-- Volume by visibility -->
-  <script>
-    AFRAME.registerComponent('volume-by-visibility', {
-      schema: {
-        maxVolume: { default: 1.0 },
-        minVolume: { default: 0.0 },
-        fadeSpeed: { default: 0.02 }
-      },
-
-      init() {
-        this.video = document.querySelector(this.el.getAttribute('src'));
-      },
-
-      tick() {
-        if (!this.video || this.video.muted) return;
-
-        const cam = this.el.sceneEl.camera;
-        if (!cam) return;
-
-        cam.updateMatrixWorld();
-
-        const frustum = new THREE.Frustum();
-        const matrix = new THREE.Matrix4().multiplyMatrices(
-          cam.projectionMatrix,
-          cam.matrixWorldInverse
-        );
-
-        frustum.setFromProjectionMatrix(matrix);
-
-        const visible = frustum.intersectsObject(this.el.object3D);
-        const target = visible ? this.schema.maxVolume : this.schema.minVolume;
-
-        this.video.volume +=
-          (target - this.video.volume) * this.schema.fadeSpeed;
-      }
-    });
-  </script>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 </head>
 
 <body style="margin:0; overflow:hidden;">
@@ -53,52 +11,35 @@
 <a-scene
   embedded
   vr-mode-ui="enabled: false"
-  arjs="sourceType: webcam; debugUIEnabled: false;"
-  renderer="logarithmicDepthBuffer: true; precision: high;">
+  arjs="sourceType: webcam; debugUIEnabled: false;">
 
-  <!-- Assets -->
-  <a-assets>
-    <video id="vid"
-      src="video2.mp4"
-      autoplay
-      loop
-      muted
-      playsinline
-      webkit-playsinline
-      preload="auto">
-    </video>
-  </a-assets>
+  <!-- Camera -->
+  <a-entity camera></a-entity>
 
-  <!-- Camera (NO GPS) -->
-  <a-camera position="0 1.6 0"></a-camera>
-
-  <!-- World anchored video -->
+  <!-- World-locked video (initially hidden) -->
   <a-video
-    src="#vid"
-    position="0 1.5 -3"
-    width="2"
-    height="1.125"
-    volume-by-visibility>
+    id="arVideo"
+    src="video3.mp4"
+    width="1.6"
+    height="0.9"
+    position="0 0 -2"
+    visible="true"
+    autoplay
+    loop>
   </a-video>
 
 </a-scene>
 
 <script>
-  const video = document.querySelector('#vid');
+  let placed = false;
+  const video = document.querySelector('#arVideo');
 
-
-
-  // Unlock sound on first interaction (required by mobile)
-  const unlock = () => {
-    video.muted = false;
-    video.volume = 1.0;
-    video.play();
-    window.removeEventListener('click', unlock);
-    window.removeEventListener('touchstart', unlock);
-  };
-
-  window.addEventListener('click', unlock);
-  window.addEventListener('touchstart', unlock);
+  document.body.addEventListener('click', () => {
+    if (!placed) {
+      video.setAttribute('visible', true);
+      placed = true;
+    }
+  });
 </script>
 
 </body>
