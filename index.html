@@ -6,7 +6,7 @@
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
-  <!-- Volume by visibility (AUDIO) -->
+  <!-- Audio by visibility -->
   <script>
     AFRAME.registerComponent('audio-by-visibility', {
       schema: {
@@ -20,7 +20,7 @@
       },
 
       tick() {
-        if (!this.audio) return;
+        if (!this.audio || this.audio.paused) return;
 
         const cam = this.el.sceneEl.camera;
         if (!cam) return;
@@ -54,7 +54,7 @@
   renderer="precision: high; logarithmicDepthBuffer: true">
 
   <a-assets>
-    <!-- VIDEO: visuals only -->
+    <!-- VIDEO: NO AUDIO TRACK -->
     <video id="vid"
       src="video2.mp4"
       autoplay
@@ -65,17 +65,15 @@
       preload="auto">
     </video>
 
-    <!-- AUDIO: sound only -->
+    <!-- AUDIO: SEPARATE FILE -->
     <audio id="audio"
-      src="video2.mp4"
+      src="audio.aac"
       preload="auto">
     </audio>
   </a-assets>
 
-  <!-- Camera -->
   <a-camera position="0 1.6 0"></a-camera>
 
-  <!-- Video entity -->
   <a-video
     src="#vid"
     position="0 1.5 -3"
@@ -91,10 +89,10 @@
   const video = document.querySelector('#vid');
   const audio = document.querySelector('#audio');
 
-  // Start video (muted) immediately
+  // Start video safely
   video.play().catch(() => {});
 
-  // Unlock audio safely on first interaction
+  // Unlock audio on first interaction
   const unlock = () => {
     audio.currentTime = video.currentTime;
     audio.play();
