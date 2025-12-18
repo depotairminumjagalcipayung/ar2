@@ -44,19 +44,6 @@
 
 </a-scene>
 
-<script>
-  const video = document.querySelector('#vid');
-
-  // HARD mobile autoplay unlock
-  document.body.addEventListener('click', () => {
-    if (video.paused) {
-      video.play();
-    }
-  }, { once: true });
-
-  // Attempt autoplay immediately
-  video.play().catch(() => {});
-</script>
 
 </body>
 </html>
