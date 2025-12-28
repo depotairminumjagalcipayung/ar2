@@ -20,28 +20,18 @@
   <a-video
     id="arVideo"
     src="video2.mp4"
-    width="1.6"
-    height="0.9"
+    width="0.8"
+    height="0.45"
     position="0 0 -2"
     rotation="0 0 0"
-    visible="false"
+    visible="true"
     autoplay
     loop>
   </a-video>
 
 </a-scene>
 
-<script>
-  let placed = false;
-  const video = document.querySelector('#arVideo');
 
-  document.body.addEventListener('click', () => {
-    if (!placed) {
-      video.setAttribute('visible', true);
-      placed = true;
-    }
-  });
-</script>
 
 </body>
 </html>
