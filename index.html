@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 </head>
@@ -9,30 +9,30 @@
 <body style="margin:0; overflow:hidden;">
 
 <a-scene
-  embedded
   vr-mode-ui="enabled: false"
-  arjs="sourceType: webcam; debugUIEnabled: false;">
+  embedded
+  arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;"
+>
 
-  <!-- Camera -->
-  <a-entity camera></a-entity>
 
-  <!-- World-locked video (initially hidden) -->
-  <a-video
-    id="arVideo"
-    src="video2.mp4"
-    width="1.6"
-    height="0.9"
-    position="0 0 -4"
-    rotation="0 0 0"
-    visible="false"
-    autoplay
-    loop
-playsinline>
-  </a-video>
+  <a-camera gps-camera rotation-reader></a-camera>
+
+
+  <a-entity gps-entity-place="latitude: -6.2; longitude: 106.8;">
+    
+    <a-video
+      src="video2.mp4"
+      width="1.6"
+      height="0.9"
+      position="0 0 0"
+      autoplay
+      loop
+      playsinline>
+    </a-video>
+
+  </a-entity>
 
 </a-scene>
-
-
 
 </body>
 </html>
